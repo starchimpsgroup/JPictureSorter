@@ -68,6 +68,7 @@ public class AverageColor {
 
     /**
      * In use, fast and acceptable difference.
+     *
      * @param image The Picture.
      * @return The average color.
      */
@@ -96,22 +97,22 @@ public class AverageColor {
             phi += phiPart;
         }
 
-        if (logger.isDebugEnabled()) {
-            MarvinImage outImage = new MarvinImage(image.getBufferedImage());
-
-            phi = 0f;
-            for (int i = 0; i < parts; i++) {
-                final int x = (int) (xM + xR * Math.cos(phi));
-                final int y = (int) (yM + yR * Math.sin(phi));
-                outImage.setIntColor(x, y, 255, 0, 0);
-                phi += phiPart;
-            }
-
-            outImage.fillRect(0, 0, 50, 50, new Color(averageRed / parts, averageGreen / parts, averageBlue / parts));
-            outImage.update();
-            MarvinImageIO.saveImage(outImage, "D:\\Workspace\\JPictureSorter\\data\\test_images\\" +
-                    String.valueOf(image.hashCode()) + "." + image.getFormatName());
-        }
+//        if (logger.isDebugEnabled()) {
+//            MarvinImage outImage = new MarvinImage(image.getBufferedImage());
+//
+//            phi = 0f;
+//            for (int i = 0; i < parts; i++) {
+//                final int x = (int) (xM + xR * Math.cos(phi));
+//                final int y = (int) (yM + yR * Math.sin(phi));
+//                outImage.setIntColor(x, y, 255, 0, 0);
+//                phi += phiPart;
+//            }
+//
+//            outImage.fillRect(0, 0, 50, 50, new Color(averageRed / parts, averageGreen / parts, averageBlue / parts));
+//            outImage.update();
+//            MarvinImageIO.saveImage(outImage, "D:\\Workspace\\JPictureSorter\\data\\test_images\\" +
+//                    String.valueOf(image.hashCode()) + "." + image.getFormatName());
+//        }
         return new Color(averageRed / parts, averageGreen / parts, averageBlue / parts);
     }
 

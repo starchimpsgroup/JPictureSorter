@@ -29,20 +29,6 @@ public class Image {
         return image;
     }
 
-//    private Color calculateAverageColor(final MarvinImage image) {
-//        float averageRed = 0;
-//        float averageGreen = 0;
-//        float averageBlue = 0;
-//        final int[] colorArray = image.getIntColorArray();
-//        for (int color : colorArray) {
-//            final Color c = new Color(color);
-//            averageRed = (averageRed + c.getRed());
-//            averageGreen = (averageGreen + c.getGreen());
-//            averageBlue = (averageBlue + c.getBlue());
-//        }
-//        return new Color((int) averageRed / colorArray.length, (int) averageGreen / colorArray.length, (int) averageBlue / colorArray.length);
-//    }
-
     public boolean isLoaded() {
         return loaded;
     }

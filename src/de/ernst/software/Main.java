@@ -11,6 +11,6 @@ import de.ernst.software.image.ImagePool;
 public class Main {
     public static void main(String[] args) {
         final ImagePool imagePool = new ImagePool();
-        imagePool.addFolder("/data/images", false);
+        imagePool.addFolder("D:\\Workspace\\JPictureSorter\\data\\images\\", false);
     }
 }

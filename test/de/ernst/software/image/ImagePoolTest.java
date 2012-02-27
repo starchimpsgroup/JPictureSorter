@@ -28,7 +28,7 @@ public class ImagePoolTest {
     @Test
     public void testAddFolder() throws Exception {
         final ImagePool imagePool = createImagePool();
-        imagePool.addFolder(/*System.getProperty("user.home")*/ "D:\\Workspace\\JPictureSorter\\data\\images", false);
+        imagePool.addFolder(Global.imagePath, false);
         assertEquals(imagePool.getImageCount(), 66);
     }
 

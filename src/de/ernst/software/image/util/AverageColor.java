@@ -23,18 +23,6 @@ public class AverageColor {
         return false;
     }
 
-    private static int getRedOfIntColor(int color) {
-        return color >>> 16 & 0xFF;
-    }
-
-    private static int getGreenOfIntColor(int color) {
-        return color >>> 8 & 0xFF;
-    }
-
-    private static int getBlueOfIntColor(int color) {
-        return color & 0xFF;
-    }
-
     /**
      * Used as reference.
      *
@@ -47,9 +35,9 @@ public class AverageColor {
         int averageBlue = 0;
         final int[] colorArray = image.getIntColorArray();
         for (int color : colorArray) {
-            final int red = getRedOfIntColor(color);
-            final int green = getGreenOfIntColor(color);
-            final int blue = getBlueOfIntColor(color);
+            final int red = IntColor.getRed(color);
+            final int green = IntColor.getGreen(color);
+            final int blue = IntColor.getBlue(color);
 
             if (isBiggerThanMaxInt(averageRed, red, "RED"))
                 return null;
@@ -90,9 +78,9 @@ public class AverageColor {
             final int y = (int) (yM + yR * Math.sin(phi));
 
             final int color = image.getIntColor(x, y);
-            averageRed += getRedOfIntColor(color);
-            averageGreen += getGreenOfIntColor(color);
-            averageBlue += getBlueOfIntColor(color);
+            averageRed += IntColor.getRed(color);
+            averageGreen += IntColor.getGreen(color);
+            averageBlue += IntColor.getBlue(color);
 
             phi += phiPart;
         }
@@ -128,9 +116,9 @@ public class AverageColor {
         int averageBlue = 0;
         final int[] colorArray = image.getIntColorArray();
         for (int color : colorArray) {
-            averageRed = (averageRed + getRedOfIntColor(color)) >> 1;
-            averageGreen = (averageGreen + getGreenOfIntColor(color)) >> 1;
-            averageBlue = (averageBlue + getBlueOfIntColor(color)) >> 1;
+            averageRed = (averageRed + IntColor.getRed(color)) >> 1;
+            averageGreen = (averageGreen + IntColor.getGreen(color)) >> 1;
+            averageBlue = (averageBlue + IntColor.getBlue(color)) >> 1;
         }
         return new Color(averageRed, averageGreen, averageBlue);
     }
@@ -147,9 +135,9 @@ public class AverageColor {
         int averageBlue = 0;
         final int[] colorArray = image.getIntColorArray();
         for (int color : colorArray) {
-            averageRed = (averageRed + getRedOfIntColor(color)) / 2;
-            averageGreen = (averageGreen + getGreenOfIntColor(color)) / 2;
-            averageBlue = (averageBlue + getBlueOfIntColor(color)) / 2;
+            averageRed = (averageRed + IntColor.getRed(color)) / 2;
+            averageGreen = (averageGreen + IntColor.getGreen(color)) / 2;
+            averageBlue = (averageBlue + IntColor.getBlue(color)) / 2;
         }
         return new Color(averageRed, averageGreen, averageBlue);
     }

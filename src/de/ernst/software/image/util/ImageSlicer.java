@@ -1,6 +1,7 @@
 package de.ernst.software.image.util;
 
 import marvin.image.MarvinImage;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,15 @@ import java.util.List;
  * Time: 18:31
  */
 public class ImageSlicer {
+    private static final Logger logger = Logger.getLogger(ImageSlicer.class);
+
+    private static int getPart(final int partCount, final int maxParts) {
+        if (partCount >= maxParts) {
+            return maxParts;
+        }
+        return partCount + 1;
+    }
+
     public static List<MarvinImage> slice(final MarvinImage image, int rows, int cols) {
         if (rows <= 0)
             rows = 1;
@@ -23,22 +33,29 @@ public class ImageSlicer {
             return null;
 
         final List<MarvinImage> images = new ArrayList<>(rows * cols);
-        System.out.println("Size: " + String.valueOf(rows * cols));
         final int rowPartSize = image.getHeight() / rows;
         final int colPartSize = image.getWidth() / cols;
-        System.out.println("Size: " + String.valueOf(rowPartSize) + " " + String.valueOf(colPartSize));
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
-                final int rowPartCount = y / rowPartSize + 1;
-                final int colPartCount = x / colPartSize + 1;
+                final int rowPartCount = getPart(y / rowPartSize, rows);
+                final int colPartCount = getPart(x / colPartSize, cols);
                 final int partCount = cols * (rowPartCount - 1) + colPartCount;
+
                 if (images.size() < partCount) {
-                    System.out.println("Count: " + String.valueOf(rowPartCount) + " " + String.valueOf(colPartCount));
-                    System.out.println("Part: " + String.valueOf(partCount));
-                    images.add(new MarvinImage(colPartSize, rowPartSize));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Count: " + String.valueOf(rowPartCount) + " " + String.valueOf(colPartCount));
+                        logger.debug("Part: " + String.valueOf(partCount));
+                    }
+                    int addCol = 0, addRow = 0;
+                    if (rowPartCount == rows)
+                        addRow = image.getHeight() % rowPartSize;
+                    if (colPartCount == cols)
+                        addCol = image.getWidth() % colPartSize;
+                    images.add(new MarvinImage(colPartSize + addCol, rowPartSize + addRow));
                 }
-                images.get(partCount - 1).setIntColor(x % colPartSize, y % rowPartSize, image.getIntColor(x, y));
+                images.get(partCount - 1).setIntColor(x - (colPartCount - 1) * colPartSize,
+                        y - (rowPartCount - 1) * rowPartSize, image.getIntColor(x, y));
             }
         }
         for (MarvinImage img : images) {

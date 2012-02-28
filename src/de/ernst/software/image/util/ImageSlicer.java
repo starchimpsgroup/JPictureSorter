@@ -32,9 +32,17 @@ public class ImageSlicer {
         if (image == null)
             return null;
 
-        final List<MarvinImage> images = new ArrayList<>(rows * cols);
         final int rowPartSize = image.getHeight() / rows;
         final int colPartSize = image.getWidth() / cols;
+
+        if (rowPartSize == 0 || colPartSize == 0) {
+            logger.error("Can not split the image, the image is maybe to small.");
+            final List<MarvinImage> images = new ArrayList<>(1);
+            images.add(image);
+            return images;
+        }
+
+        final List<MarvinImage> images = new ArrayList<>(rows * cols);
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {

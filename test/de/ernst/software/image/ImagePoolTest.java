@@ -29,7 +29,7 @@ public class ImagePoolTest {
     public void testAddFolder() throws Exception {
         final ImagePool imagePool = createImagePool();
         imagePool.addFolder(Global.imagePath, false);
-        assertEquals(imagePool.getImageCount(), 67);
+        assertEquals(imagePool.getImageCount(), 68);
     }
 
     @Test

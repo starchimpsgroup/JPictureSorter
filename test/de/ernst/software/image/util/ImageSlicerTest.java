@@ -20,10 +20,11 @@ public class ImageSlicerTest {
 
     @Test
     public void testSlice() throws Exception {
-        saveImages(ImageSlicer.slice(image, 3, 2));
-        saveImages(ImageSlicer.slice(image901x601, 2, 2));
-        saveImages(ImageSlicer.slice(image1x1, 2, 2));
-//        saveImages(ImageSlicer.slice(image, 3, 3));
+//        saveImages(ImageSlicer.slice(image, 3, 2));
+//        saveImages(ImageSlicer.slice(image901x601, 2, 2));
+//        saveImages(ImageSlicer.slice(image901x601, 4, 2));
+//        saveImages(ImageSlicer.slice(image1x1, 2, 2));
+        saveImages(ImageSlicer.slice(image, 3, 3));
 //        saveImages(ImageSlicer.slice(image, 32, 20));
     }
 
@@ -31,9 +32,11 @@ public class ImageSlicerTest {
         if (images == null)
             return;
 
+        int i = 0;
         for (MarvinImage image : images) {
             MarvinImageIO.saveImage(image, Global.testPath +
-                    String.valueOf(image.hashCode()) + "." + image.getFormatName());
+                    String.valueOf(/*image.hashCode()*/i) + "." + image.getFormatName());
+            i++;
         }
     }
 }

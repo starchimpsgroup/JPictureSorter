@@ -55,12 +55,8 @@ public class ImageSlicer {
                         logger.debug("Count: " + String.valueOf(rowPartCount) + " " + String.valueOf(colPartCount));
                         logger.debug("Part: " + String.valueOf(partCount));
                     }
-                    int addCol = 0, addRow = 0;
-                    if (rowPartCount == rows)
-                        addRow = image.getHeight() % rowPartSize;
-                    if (colPartCount == cols)
-                        addCol = image.getWidth() % colPartSize;
-                    images.add(new MarvinImage(colPartSize + addCol, rowPartSize + addRow));
+                    images.add(new MarvinImage(colPartSize + (colPartCount == cols ? image.getWidth() % colPartSize : 0),
+                            rowPartSize + (rowPartCount == rows ? image.getHeight() % rowPartSize : 0)));
                 }
                 images.get(partCount - 1).setIntColor(x - (colPartCount - 1) * colPartSize,
                         y - (rowPartCount - 1) * rowPartSize, image.getIntColor(x, y));

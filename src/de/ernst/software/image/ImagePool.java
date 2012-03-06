@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -57,5 +58,12 @@ public class ImagePool {
 
     public int getImageCount() {
         return images.size();
+    }
+
+    private class ColorComparator implements Comparator<Image> {
+        @Override
+        public int compare(final Image a, final Image b) {
+            return 0;
+        }
     }
 }

@@ -1,12 +1,15 @@
 package de.ernst.software.image;
 
 import de.ernst.software.image.util.AverageColor;
+import de.ernst.software.image.util.ImageSlicer;
 import marvin.image.MarvinImage;
 import marvin.io.MarvinImageIO;
-import marvin.plugin.MarvinImagePlugin;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +21,7 @@ public class Image {
     private static final Logger logger = Logger.getLogger(Image.class);
     private final boolean loaded;
     private final Color averageColor;
-    private final Color[] averageColorArray;
+    private final List<Color> averageColorList;
 
     private MarvinImage loadImage(final String imagePath) {
         MarvinImage image = null;
@@ -39,23 +42,26 @@ public class Image {
         loaded = image != null;
         if (loaded) {
             averageColor = AverageColor.circleLineScan(image);
-            averageColorArray = new Color[9];
-
-//            MarvinImagePlugin plugin = new ImageSlicer();
-//            plugin.load();
-//            MarvinImage slicedImage = new MarvinImage(image.getBufferedImage());
-//            plugin.process(image, slicedImage, null, null, false);
+            averageColorList = new ArrayList<>(9);
+            final List<MarvinImage> images = ImageSlicer.slice(image, 3, 3);
+            for (final MarvinImage img : images) {
+                averageColorList.add(AverageColor.circleLineScan(img));
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug(averageColor);
-                logger.debug(averageColorArray);
+                logger.debug(averageColorList);
             }
         } else {
             averageColor = null;
-            averageColorArray = null;
+            averageColorList = null;
         }
     }
 
     public Color getAverageColor() {
         return averageColor;
+    }
+
+    public List<Color> getAverageColorList() {
+        return averageColorList;
     }
 }

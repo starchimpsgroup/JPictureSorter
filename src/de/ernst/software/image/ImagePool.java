@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -39,13 +40,17 @@ public class ImagePool {
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             for (final File file : files) {
-                final Image image = new Image(file.getPath());
-                if (image.isLoaded()) {
-                    images.add(image);
-                    if (logger.isDebugEnabled()) {
-                        String type = (file.isDirectory() ? "dir " : "file");
-                        logger.debug("read " + type + ": " + file);
+                if (file.isFile()) {
+                    final Image image = new Image(file.getPath());
+                    if (image.isLoaded()) {
+                        images.add(image);
+                        if (logger.isDebugEnabled()) {
+                            String type = (file.isDirectory() ? "dir " : "file");
+                            logger.debug("read " + type + ": " + file);
+                        }
                     }
+                } else if (file.isDirectory() && recursive) {
+
                 }
             }
         } else {
@@ -63,7 +68,31 @@ public class ImagePool {
     private class ColorComparator implements Comparator<Image> {
         @Override
         public int compare(final Image a, final Image b) {
+            if (a.getAverageColor().getRed() > b.getAverageColor().getRed()) {
+                return 1;
+            } else if (a.getAverageColor().getRed() < b.getAverageColor().getRed()) {
+                return -1;
+            }
+
+            if (a.getAverageColor().getGreen() > b.getAverageColor().getGreen()) {
+                return 1;
+            } else if (a.getAverageColor().getGreen() < b.getAverageColor().getGreen()) {
+                return -1;
+            }
+
+            if (a.getAverageColor().getBlue() > b.getAverageColor().getBlue()) {
+                return 1;
+            } else if (a.getAverageColor().getBlue() < b.getAverageColor().getBlue()) {
+                return -1;
+            }
+
             return 0;
         }
+    }
+
+    public List<Image> getColorSortedImages() {
+        final ArrayList<Image> list = new ArrayList<>(images);
+        Collections.sort(list, new ColorComparator());
+        return list;
     }
 }

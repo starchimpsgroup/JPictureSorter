@@ -51,8 +51,10 @@ public class ImagePoolTest {
         final ImagePool imagePool = createFilledImagePool();
         final List<Image> colorSortedImages = imagePool.getColorSortedImages();
         System.out.println(colorSortedImages);
-        for (int i = 0; i < colorSortedImages.size(); i++)
+        for (int i = 0; i < colorSortedImages.size(); i++) {
             MarvinImageIO.saveImage(colorSortedImages.get(i).getSmallImage(), Global.testPath +
                     String.valueOf(i) + "." + colorSortedImages.get(i).getFormat());
+            System.out.println(colorSortedImages.get(i));
+        }
     }
 }

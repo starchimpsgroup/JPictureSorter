@@ -2,6 +2,8 @@ package de.ernst.software.image;
 
 import de.ernst.software.image.util.AverageColor;
 import de.ernst.software.image.util.ImageSlicer;
+import de.ernst.software.thread.AutoThread;
+import de.ernst.software.thread.Thread;
 import marvin.image.MarvinImage;
 import marvin.io.MarvinImageIO;
 import org.apache.log4j.Logger;
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -19,8 +23,10 @@ import java.util.Map;
  * Date: 14.02.12
  * Time: 10:55
  */
-public class Image {
+public class Image extends AutoThread {
     private static final Logger logger = Logger.getLogger(Image.class);
+
+    private static final ExecutorService threadPool = Executors.newFixedThreadPool(8);
     private static final Map<String, String> formats = new HashMap<>();
 
     static {
@@ -28,12 +34,13 @@ public class Image {
     }
 
     private final boolean loaded;
-    private final Color averageColor;
-    private final List<Color> averageColorList;
     private final String path;
     private final String name;
-    private final String format;
-    private final MarvinImage smallImage;
+
+    private Color averageColor;
+    private List<Color> averageColorList;
+    private MarvinImage smallImage;
+    private String format;
 
     private MarvinImage loadImage(final String imagePath) {
         MarvinImage image = null;
@@ -83,42 +90,51 @@ public class Image {
         return loaded;
     }
 
+    @Thread("init")
+    private void init(final MarvinImage image) {
+        averageColor = AverageColor.circleLineScan(image);
+        averageColorList = new ArrayList<>(9);
+        final List<MarvinImage> images = ImageSlicer.slice(image, 3, 3);
+        for (final MarvinImage img : images) {
+            averageColorList.add(AverageColor.circleLineScan(img));
+        }
+        smallImage = resizeImage(image, 200);
+        format = getFormat(image);
+        if (logger.isDebugEnabled()) {
+            logger.debug(averageColor);
+            logger.debug(averageColorList);
+            logger.debug(path);
+            logger.debug(name);
+            logger.debug(format);
+        }
+    }
+
     public Image(final String imagePath) {
+        super(threadPool);
         final MarvinImage image = loadImage(imagePath);
         loaded = image != null;
         if (loaded) {
-            averageColor = AverageColor.circleLineScan(image);
-            averageColorList = new ArrayList<>(9);
-            final List<MarvinImage> images = ImageSlicer.slice(image, 3, 3);
-            for (final MarvinImage img : images) {
-                averageColorList.add(AverageColor.circleLineScan(img));
-            }
-            smallImage = resizeImage(image, 200);
             path = imagePath;
             name = getName(imagePath);
-            format = getFormat(image);
-            if (logger.isDebugEnabled()) {
-                logger.debug(averageColor);
-                logger.debug(averageColorList);
-                logger.debug(path);
-                logger.debug(name);
-                logger.debug(format);
-            }
+            run("init", image);
         } else {
+            path = null;
+            name = null;
+
             averageColor = null;
             averageColorList = null;
-            path = null;
             smallImage = null;
-            name = null;
             format = null;
         }
     }
 
     public Color getAverageColor() {
+        waitFor("init");
         return averageColor;
     }
 
     public List<Color> getAverageColorList() {
+        waitFor("init");
         return averageColorList;
     }
 
@@ -127,10 +143,12 @@ public class Image {
     }
 
     public MarvinImage getSmallImage() {
+        waitFor("init");
         return smallImage;
     }
 
     public String getFormat() {
+        waitFor("init");
         return format;
     }
 

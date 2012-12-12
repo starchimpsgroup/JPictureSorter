@@ -1,12 +1,12 @@
 package de.ernst.software.image.util;
 
 import de.ernst.software.image.Global;
+import de.ernst.software.image.color.AverageColor;
 import marvin.image.MarvinImage;
 import marvin.io.MarvinImageIO;
 import org.junit.Test;
 
 import java.awt.*;
-import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * Time: 14:32
  */
 public class AverageColorTest {
-    public MarvinImage image = MarvinImageIO.loadImage(Global.imagePath + "1283837294038.jpg");
+    private final static MarvinImage image = MarvinImageIO.loadImage(Global.imagePath + "1283837294038.jpg");
 
     @Test
     public void testAllPixel() throws Exception {

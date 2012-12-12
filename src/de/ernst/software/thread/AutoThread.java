@@ -1,5 +1,6 @@
 package de.ernst.software.thread;
 
+import org.apache.log4j.Logger;
 import sun.awt.Mutex;
 
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +16,8 @@ import java.util.concurrent.ExecutorService;
  * Time: 11:10
  */
 public class AutoThread {
+    private static final Logger logger = Logger.getLogger(AutoThread.class);
+
     private final ExecutorService threadPool;
     private final Map<String, Integer> running = new HashMap<>();
 
@@ -25,26 +28,30 @@ public class AutoThread {
     protected void run(final String name, final Object... args) {
         final Method[] methods = this.getClass().getDeclaredMethods();
         for (final Method method : methods) {
-            if (method.isAnnotationPresent(Thread.class) && method.getAnnotation(Thread.class).value().equals(name) && method.getReturnType().equals(void.class)) { // TODO debug
-                increment(name);
-                threadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (!method.isAccessible()) {
-                                method.setAccessible(true);
+            if (method.isAnnotationPresent(Thread.class) && method.getAnnotation(Thread.class).value().equals(name)) {
+                if (method.getReturnType().equals(void.class)) {
+                    increment(name);
+                    threadPool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                if (!method.isAccessible()) {
+                                    method.setAccessible(true);
+                                }
+                                method.invoke(AutoThread.this, args);
+                            } catch (InvocationTargetException | IllegalAccessException e) {
+                                logger.error(e.getMessage());
+                            } finally {
+                                final Mutex mutex = new Mutex();
+                                mutex.lock();
+                                decrement(name);
+                                mutex.unlock();
                             }
-                            method.invoke(AutoThread.this, args);
-                        } catch (InvocationTargetException | IllegalAccessException e) {
-                            e.printStackTrace(); // TODO debug
-                        } finally {
-                            final Mutex mutex = new Mutex();
-                            mutex.lock();
-                            decrement(name);
-                            mutex.unlock();
                         }
-                    }
-                });
+                    });
+                } else {
+                    logger.error("The return-type of the method '" + method.getName() + "' must be 'void'!");
+                }
             }
         }
     }

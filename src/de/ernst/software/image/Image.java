@@ -1,9 +1,11 @@
 package de.ernst.software.image;
 
-import de.ernst.software.image.util.AverageColor;
+import de.ernst.software.image.color.AverageColor;
+import de.ernst.software.image.color.BaseColor;
 import de.ernst.software.image.util.ImageSlicer;
 import de.ernst.software.thread.AutoThread;
 import de.ernst.software.thread.Thread;
+import de.ernst.software.thread.ThreadPool;
 import marvin.image.MarvinImage;
 import marvin.io.MarvinImageIO;
 import org.apache.log4j.Logger;
@@ -13,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -26,7 +26,8 @@ import java.util.concurrent.Executors;
 public class Image extends AutoThread {
     private static final Logger logger = Logger.getLogger(Image.class);
 
-    private static final ExecutorService threadPool = Executors.newFixedThreadPool(8);
+    private static final String INIT = "init";
+
     private static final Map<String, String> formats = new HashMap<>();
 
     static {
@@ -37,10 +38,12 @@ public class Image extends AutoThread {
     private final String path;
     private final String name;
 
-    private Color averageColor;
-    private List<Color> averageColorList;
-    private MarvinImage smallImage;
-    private String format;
+    private Color averageColor = null;
+    //    private float[] hsb = null;
+    private BaseColor[] baseColor = null;
+    private List<Color> averageColorList = null;
+    private MarvinImage smallImage = null;
+    private String format = null;
 
     private MarvinImage loadImage(final String imagePath) {
         MarvinImage image = null;
@@ -90,9 +93,15 @@ public class Image extends AutoThread {
         return loaded;
     }
 
-    @Thread("init")
+//    private float[] getHSB(final Color color) {
+//        return Color.RGBtoHSB(color.getRed(), color.getRed(), color.getBlue(), null);
+//    }
+
+    @Thread(INIT)
     private void init(final MarvinImage image) {
         averageColor = AverageColor.circleLineScan(image);
+//        hsb = getHSB(averageColor);
+        baseColor = BaseColor.getBaseColorRange(averageColor);
         averageColorList = new ArrayList<>(9);
         final List<MarvinImage> images = ImageSlicer.slice(image, 3, 3);
         for (final MarvinImage img : images) {
@@ -102,6 +111,9 @@ public class Image extends AutoThread {
         format = getFormat(image);
         if (logger.isDebugEnabled()) {
             logger.debug(averageColor);
+//            logger.debug("H: " + String.valueOf(hsb[0]) + " S: " + String.valueOf(hsb[1]) + " B: " + String.valueOf(hsb[2]));
+            for (BaseColor color : baseColor)
+                logger.debug(color);
             logger.debug(averageColorList);
             logger.debug(path);
             logger.debug(name);
@@ -110,31 +122,46 @@ public class Image extends AutoThread {
     }
 
     public Image(final String imagePath) {
-        super(threadPool);
+        super(ThreadPool.getInstance());
         final MarvinImage image = loadImage(imagePath);
         loaded = image != null;
         if (loaded) {
             path = imagePath;
             name = getName(imagePath);
-            run("init", image);
+            run(INIT, image);
         } else {
             path = null;
             name = null;
-
-            averageColor = null;
-            averageColorList = null;
-            smallImage = null;
-            format = null;
         }
     }
 
     public Color getAverageColor() {
-        waitFor("init");
+        waitFor(INIT);
         return averageColor;
     }
 
+//    public float[] getHSB() {
+//        waitFor(INIT);
+//        return hsb;
+//    }
+
+//    public float getHue() {
+//        waitFor(INIT);
+//        return hsb[0];
+//    }
+//
+//    public float getSaturation() {
+//        waitFor(INIT);
+//        return hsb[1];
+//    }
+//
+//    public float getBrightness() {
+//        waitFor(INIT);
+//        return hsb[2];
+//    }
+
     public List<Color> getAverageColorList() {
-        waitFor("init");
+        waitFor(INIT);
         return averageColorList;
     }
 
@@ -143,12 +170,12 @@ public class Image extends AutoThread {
     }
 
     public MarvinImage getSmallImage() {
-        waitFor("init");
+        waitFor(INIT);
         return smallImage;
     }
 
     public String getFormat() {
-        waitFor("init");
+        waitFor(INIT);
         return format;
     }
 

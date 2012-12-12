@@ -1,4 +1,6 @@
-package de.ernst.software.image.util;
+package de.ernst.software.image.color;
+
+import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -6,7 +8,7 @@ package de.ernst.software.image.util;
  * Date: 26.02.12
  * Time: 20:21
  */
-public class IntColor {
+public class IntToRgbColor {
     public static int getRed(int color) {
         return color >>> 16 & 0xFF;
     }
@@ -17,5 +19,9 @@ public class IntColor {
 
     public static int getBlue(int color) {
         return color & 0xFF;
+    }
+
+    public static Color getRgb(int color) {
+        return new Color(getRed(color), getGreen(color), getBlue(color));
     }
 }

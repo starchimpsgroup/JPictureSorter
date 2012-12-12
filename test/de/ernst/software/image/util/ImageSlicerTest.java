@@ -14,9 +14,9 @@ import java.util.List;
  * Time: 22:09
  */
 public class ImageSlicerTest {
-    public MarvinImage image = MarvinImageIO.loadImage(Global.imagePath + "1283837294038.jpg");
-    public MarvinImage image901x601 = MarvinImageIO.loadImage(Global.imagePath + "901x601.jpg");
-    public MarvinImage image1x1 = MarvinImageIO.loadImage(Global.imagePath + "1x1.jpg");
+    private final static MarvinImage image = MarvinImageIO.loadImage(Global.imagePath + "1283837294038.jpg");
+    private final static MarvinImage image901x601 = MarvinImageIO.loadImage(Global.imagePath + "901x601.jpg");
+    private final static MarvinImage image1x1 = MarvinImageIO.loadImage(Global.imagePath + "1x1.jpg");
 
     @Test
     public void testSlice() throws Exception {

@@ -26,33 +26,31 @@ public class ImagePool {
         addFolder(directoryPath, recursive);
     }
 
-    public boolean addImage(final String imagePath) {
+    public void addImage(final String imagePath) {
         final Image image = new Image(imagePath);
         if (image.isLoaded()) {
             images.add(image);
-            return true;
         }
-        return false;
     }
 
-    public boolean deleteImage(final Image image) {
-        return images.remove(image);
+    public void deleteImage(final Image image) {
+        images.remove(image);
     }
 
     private void addFolder(final File dir, final List<Image> images, final boolean recursive) {
         File[] files = dir.listFiles();
         for (final File file : files) {
+            if (logger.isDebugEnabled()) {
+                String type = (file.isDirectory() ? "dir " : "file");
+                logger.debug("read " + type + ": " + file);
+            }
             if (file.isFile()) {
                 final Image image = new Image(file.getPath());
                 if (image.isLoaded()) {
                     images.add(image);
-                    if (logger.isDebugEnabled()) {
-                        String type = (file.isDirectory() ? "dir " : "file");
-                        logger.debug("read " + type + ": " + file);
-                    }
-                } else if (recursive && file.isDirectory()) {
-                    addFolder(file, images, recursive);
                 }
+            } else if (recursive && file.isDirectory()) {
+                addFolder(file, images, recursive);
             }
         }
     }
@@ -76,23 +74,38 @@ public class ImagePool {
     private class ColorComparator implements Comparator<Image> {
         @Override
         public int compare(final Image a, final Image b) {
-            if (a.getAverageColor().getRed() > b.getAverageColor().getRed()) {
-                return 1;
-            } else if (a.getAverageColor().getRed() < b.getAverageColor().getRed()) {
-                return -1;
-            }
+//            if (a.getAverageColor().getRed() > b.getAverageColor().getRed()) {
+//                return 1;
+//            } else if (a.getAverageColor().getRed() < b.getAverageColor().getRed()) {
+//                return -1;
+//            }
+//
+//            if (a.getAverageColor().getGreen() > b.getAverageColor().getGreen()) {
+//                return 1;
+//            } else if (a.getAverageColor().getGreen() < b.getAverageColor().getGreen()) {
+//                return -1;
+//            }
+//
+//            if (a.getAverageColor().getBlue() > b.getAverageColor().getBlue()) {
+//                return 1;
+//            } else if (a.getAverageColor().getBlue() < b.getAverageColor().getBlue()) {
+//                return -1;
+//            }
 
-            if (a.getAverageColor().getGreen() > b.getAverageColor().getGreen()) {
-                return 1;
-            } else if (a.getAverageColor().getGreen() < b.getAverageColor().getGreen()) {
-                return -1;
-            }
-
-            if (a.getAverageColor().getBlue() > b.getAverageColor().getBlue()) {
-                return 1;
-            } else if (a.getAverageColor().getBlue() < b.getAverageColor().getBlue()) {
-                return -1;
-            }
+//            if (a.getHue() > b.getHue())
+//                return 1;
+//            else if (a.getHue() < b.getHue())
+//                return -1;
+//
+//            if (a.getSaturation() > b.getSaturation())
+//                return 1;
+//            else if (a.getSaturation() < b.getSaturation())
+//                return -1;
+//
+//            if (a.getBrightness() < b.getBrightness())
+//                return 1;
+//            else if (a.getBrightness() > b.getBrightness())
+//                return -1;
 
             return 0;
         }
